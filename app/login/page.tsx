@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple, FaFacebookF } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,23 +60,25 @@ export default function LoginPage() {
 
         {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
-        <button
+        <Button
           onClick={handleLogin}
           className="mt-6 w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
-        >Se connecter</button>
+        >
+          Se connecter
+        </Button>
 
         <p className="text-center text-sm text-gray-600 mt-4">ou continuer avec</p>
 
         <div className="flex justify-center gap-4 mt-4">
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
+          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
             <FcGoogle size={20} /> Google
-          </button>
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
+          </Button>
+          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
             <FaApple size={20} /> Apple
-          </button>
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
+          </Button>
+          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
             <FaFacebookF size={20} className="text-blue-600" /> Facebook
-          </button>
+          </Button>
         </div>
 
         <p className="text-center text-sm text-gray-600 mt-6">
