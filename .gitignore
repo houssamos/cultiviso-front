@@ -1,0 +1,49 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Env
+.env
+.env.*
+
+# Logs
+logs
+*.log
+
+# Prisma
+/prisma/dev.db
+/prisma/migrations/
+
+# Coverage / Test
+coverage/
+*.lcov
+
+# Build
+build/
+dist/
+
+# VSCode
+.vscode/
+
+# Mac/Linux
+.DS_Store
+Thumbs.db
+
+# System
+.idea/
+.next/
+
+# Local exports
+*.sqlite
+*.zip
+*.tar.gznode_modules
+
+# Temporary files
+*.tmp
+*.next
+*.bak
+*.orig 
+*.swp
+*.swo
