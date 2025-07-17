@@ -4,6 +4,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 
+export const NAV_ITEMS = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Carte', href: '/carte' },
+  { label: 'Statistiques', href: '#' },
+  { label: 'Échanges', href: '#' },
+  { label: 'Contact', href: '#' },
+  { label: 'À propos', href: '#' },
+];
+
 interface HeaderProps {
   menuOpen: boolean;
   setMenuOpen: (open: boolean) => void;
@@ -19,12 +28,11 @@ export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
 
       {/* Desktop Menu */}
       <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-        <Link href="/">Accueil</Link>
-        <Link href="/carte">Carte</Link>
-        <Link href="#">Statistiques</Link>
-        <Link href="#">Échanges</Link>
-        <Link href="#">Contact</Link>
-        <Link href="#">À propos</Link>
+        {NAV_ITEMS.map(({ href, label }) => (
+          <Link key={href} href={href}>
+            {label}
+          </Link>
+        ))}
       </nav>
 
       <div className="hidden md:flex items-center gap-4">
