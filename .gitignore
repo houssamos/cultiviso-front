@@ -38,7 +38,7 @@ Thumbs.db
 # Local exports
 *.sqlite
 *.zip
-*.tar.gznode_modules
+*.tar.gz
 
 # Temporary files
 *.tmp
