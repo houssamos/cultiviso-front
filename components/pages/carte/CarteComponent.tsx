@@ -230,7 +230,7 @@ export default function CarteComponent() {
       {thresholds.length > 0 && (
         <CarteLegend thresholds={thresholds} colors={colors} indicator={selectedIndicator} />
       )}
-      <FooterNav />
+      {/* <FooterNav /> */}
     </div>
   );
 }
