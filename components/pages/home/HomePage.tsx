@@ -2,12 +2,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import HeroHeader from './HeroHeader';
 import StatsSection from './StatsSection';
+import Header from '../../layout/Header';
+import Footer from '../../layout/Footer';
 
 export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,41 +15,7 @@ export default function HomePage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#f7f1e4] text-gray-900">
       {/* Header with logo and menu */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-[#f7f1e4]">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/cultiviso-logo.png"
-            alt="Cultiviso Logo"
-            width={40}
-            height={40}
-          />
-          <span className="text-xl font-bold text-green-800">Cultiviso</span>
-        </div>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-          <Link href="/">Accueil</Link>
-          <Link href="/carte">Carte</Link>
-          <Link href="#">Statistiques</Link>
-          <Link href="#">Échanges</Link>
-          <Link href="#">Contact</Link>
-          <Link href="#">À propos</Link>
-        </nav>
-
-        <div className="hidden md:flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium text-green-800 hover:underline">Connexion</Link>
-          <Link href="/signup" className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800">Créer un compte</Link>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-gray-700"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Menu"
-        >
-          {menuOpen ? <X className="w-6 h-6 transition-transform duration-300" /> : <Menu className="w-6 h-6 transition-transform duration-300" />}
-        </button>
-      </header>
+      <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
       {/* Mobile full-screen menu */}
       <div className={clsx(
@@ -104,31 +70,7 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-10 px-6">
-          <div className="max-w-6xl mx-auto grid sm:grid-cols-3 gap-8">
-            <div>
-              <h4 className="font-bold text-lg mb-2">Cultiviso</h4>
-              <p className="text-sm text-gray-300">Votre partenaire pour comprendre et échanger sur l’agriculture française.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Liens utiles</h4>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li><Link href="#">À propos</Link></li>
-                <li><Link href="#">Contact</Link></li>
-                <li><Link href="#">Mentions légales</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Réseaux</h4>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li><Link href="#">LinkedIn</Link></li>
-                <li><Link href="#">Twitter</Link></li>
-                <li><Link href="#">contact@cultiviso.fr</Link></li>
-              </ul>
-            </div>
-          </div>
-          <p className="text-center text-gray-500 text-xs mt-8">© {new Date().getFullYear()} Cultiviso. Tous droits réservés.</p>
-        </footer>
+        <Footer />
       </div>
     </main>
   );
