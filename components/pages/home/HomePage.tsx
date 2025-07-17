@@ -6,7 +6,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import HeroHeader from './HeroHeader';
 import StatsSection from './StatsSection';
-import Header from '../../layout/Header';
+import Header, { NAV_ITEMS } from '../../layout/Header';
 import Footer from '../../layout/Footer';
 
 export default function HomePage() {
@@ -23,12 +23,15 @@ export default function HomePage() {
         menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       )}>
         <nav className="flex flex-col items-center gap-6">
-          <Link href="/" onClick={() => setMenuOpen(false)}>Accueil</Link>
-          <Link href="/carte" onClick={() => setMenuOpen(false)}>Carte</Link>
-          <Link href="#" onClick={() => setMenuOpen(false)}>Statistiques</Link>
-          <Link href="#" onClick={() => setMenuOpen(false)}>Échanges</Link>
-          <Link href="#" onClick={() => setMenuOpen(false)}>Contact</Link>
-          <Link href="#" onClick={() => setMenuOpen(false)}>À propos</Link>
+          {NAV_ITEMS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
         <div className="flex flex-col items-center gap-2 mt-6">
           <Link href="/login" className="text-green-800 text-sm font-medium">Connexion</Link>
