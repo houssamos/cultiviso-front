@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import bbox from '@turf/bbox';
 import booleanOverlap from '@turf/boolean-overlap';
 import * as turf from '@turf/helpers';
+import { API_BASE } from '@/lib/api';
 
 
 interface Culture {
@@ -75,11 +76,11 @@ export default function CarteComponent() {
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
   useEffect(() => {
-    fetch('http://localhost:3001/v1/cultures', {
+    fetch(`${API_BASE}/v1/cultures`, {
       headers: { 'X-api-key': `${API_KEY}` },
     }).then(res => res.json()).then(setCultures);
 
-    fetch('http://localhost:3001/v1/cultures/years', {
+    fetch(`${API_BASE}/v1/cultures/years`, {
       headers: { 'X-api-key': `${API_KEY}` },
     }).then(res => res.json()).then(setYears);
   }, []);
@@ -99,7 +100,7 @@ export default function CarteComponent() {
     if (!selectedYear || !selectedCulture || !mapRef.current) return;
 
     const map = mapRef.current;
-    const url = `http://localhost:3001/v1/stats/regions?year=${selectedYear}&cultureId=${selectedCulture}`;
+    const url = `${API_BASE}/v1/stats/regions?year=${selectedYear}&cultureId=${selectedCulture}`;
 
     fetch(url, {
       headers: { 'X-api-key': `${API_KEY}` },
