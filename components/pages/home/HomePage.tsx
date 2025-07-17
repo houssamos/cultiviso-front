@@ -2,14 +2,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
+import HeroHeader from './HeroHeader';
+import StatsSection from './StatsSection';
 
 export default function HomePage() {
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -72,28 +72,10 @@ export default function HomePage() {
 
       <div className="pt-20">
         {/* Hero Section */}
-        <section className="flex flex-col items-center justify-center text-center px-4 py-20">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-green-800">Découvrez la nouvelle plateforme agricole française</h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-6">Statistiques. Transactions. Communauté.</p>
-          <div className="flex gap-4 flex-wrap justify-center">
-            <button
-              onClick={() => router.push('/carte')}
-              className="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-full"
-            >Explorer les données</button>
-            <button
-              className="border border-green-700 text-green-700 font-semibold py-2 px-6 rounded-full"
-            >Prochaine ouverture</button>
-          </div>
-        </section>
+        <HeroHeader />
 
         {/* Aperçu Stats */}
-        <section className="py-16 px-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Une vue d'ensemble du territoire</h2>
-          <p className="text-gray-600 mb-8">+100 000 hectares analysés • +50 cultures référencées • Données publiques consolidées</p>
-          <div className="w-full max-w-4xl h-64 mx-auto bg-gray-200 rounded-lg shadow-inner flex items-center justify-center">
-            <span className="text-gray-500">[Mini carte interactive ici]</span>
-          </div>
-        </section>
+        <StatsSection />
 
         {/* Teasing plateforme */}
         <section className="bg-gold py-16 px-6 text-center">
