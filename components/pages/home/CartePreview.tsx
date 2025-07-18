@@ -52,7 +52,7 @@ export default function CartePreview() {
           headers: { 'X-api-key': `${API_KEY}` },
         });
         const cultures: Culture[] = await culturesRes.json();
-        const culture = cultures.find(c => c.name === 'total Blé tendre');
+        const culture = cultures.find(c => c.name === 'Total blé tendre');
         if (!culture) return;
         const cultureId = culture.id;
 
