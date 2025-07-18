@@ -33,10 +33,17 @@ export default function CartePreview() {
     mapRef.current = new maplibregl.Map({
       container: mapContainer.current,
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.2137, 46.2276],
-      zoom: 5,
+      interactive: false,
       attributionControl: false,
     });
+
+    mapRef.current.fitBounds(
+      [
+        [-5.9, 41.2],
+        [9.6, 51.2],
+      ],
+      { padding: 0, duration: 0 }
+    );
 
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
