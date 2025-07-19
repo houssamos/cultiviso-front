@@ -7,7 +7,7 @@ import { Menu, X } from 'lucide-react';
 export const NAV_ITEMS = [
   { label: 'Accueil', href: '/' },
   { label: 'Carte', href: '/carte' },
-  { label: 'Statistiques', href: '#' },
+  { label: 'Statistiques', href: '/stats' },
   { label: 'Échanges', href: '#' },
   { label: 'Contact', href: '#' },
   { label: 'À propos', href: '#' },
