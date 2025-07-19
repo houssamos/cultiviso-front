@@ -38,6 +38,17 @@ interface Culture {
   name: string;
 }
 
+interface StatItem {
+  id: string;
+  year: number;
+  regionId?: string;
+  regionName?: string;
+  cultureId: string;
+  surfaceHa: number;
+  yieldQxHa: number;
+  productionT: number;
+}
+
 export default function StatsPage() {
   const [cultures, setCultures] = useState<Culture[]>([]);
   const [years, setYears] = useState<number[]>([]);
@@ -45,6 +56,7 @@ export default function StatsPage() {
   const [selectedCulture, setSelectedCulture] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [granularity, setGranularity] = useState<string>('region');
+  const [stats, setStats] = useState<StatItem[]>([]);
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -64,37 +76,88 @@ export default function StatsPage() {
       .catch(console.error);
   }, []);
 
-  // Sample data for demonstration
-  const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
-  const numbers = labels.map((_, i) => i + 1);
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedYear) params.append('year', String(selectedYear));
+    if (selectedCulture) params.append('cultureId', selectedCulture);
+    if (selectedRegion) params.append('regionId', selectedRegion);
+    params.append('granularity', granularity);
+    params.append('page', '1');
+    params.append('limit', '100');
 
-  const baseDataset = {
-    label: 'Exemple',
-    data: numbers,
-    borderColor: 'rgb(75,192,192)',
-    backgroundColor: 'rgba(75,192,192,0.2)'
+    fetch(`${API_BASE}/v1/stats?${params.toString()}`, {
+      headers: { 'X-api-key': API_KEY || '' }
+    })
+      .then(res => res.json())
+      .then((data: StatItem[]) => setStats(data))
+      .catch(console.error);
+  }, [selectedYear, selectedCulture, selectedRegion, granularity]);
+
+  const yearMap = stats.reduce<Record<number, StatItem[]>>((acc, item) => {
+    if (!acc[item.year]) acc[item.year] = [];
+    acc[item.year].push(item);
+    return acc;
+  }, {});
+  const yearLabels = Object.keys(yearMap).sort();
+  const yields = yearLabels.map(y => {
+    const arr = yearMap[Number(y)];
+    const avg = arr.reduce((s, it) => s + it.yieldQxHa, 0) / (arr.length || 1);
+    return Number(avg.toFixed(2));
+  });
+  const surfaces = yearLabels.map(y =>
+    yearMap[Number(y)].reduce((s, it) => s + it.surfaceHa, 0)
+  );
+
+  const regionMap = stats.reduce<Record<string, number>>((acc, item) => {
+    const key = item.regionName || item.regionId || 'N/A';
+    acc[key] = (acc[key] || 0) + item.productionT;
+    return acc;
+  }, {});
+  const regionLabels = Object.keys(regionMap);
+  const productions = regionLabels.map(r => regionMap[r]);
+
+  const colors = ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40'];
+
+  const lineData = {
+    labels: yearLabels,
+    datasets: [{
+      label: 'Rendement (q/ha)',
+      data: yields,
+      borderColor: 'rgb(75,192,192)',
+      backgroundColor: 'rgba(75,192,192,0.2)'
+    }]
   };
 
-  const lineData = { labels, datasets: [baseDataset] };
-  const barData = { labels, datasets: [{ ...baseDataset, backgroundColor: 'rgba(53,162,235,0.5)' }] };
+  const barData = {
+    labels: yearLabels,
+    datasets: [{
+      label: 'Surface (ha)',
+      data: surfaces,
+      backgroundColor: 'rgba(53,162,235,0.5)'
+    }]
+  };
+
   const pieData = {
-    labels: labels.slice(0, 5),
-    datasets: [{ data: numbers.slice(0, 5), backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff'] }]
+    labels: regionLabels,
+    datasets: [{
+      data: productions,
+      backgroundColor: colors.slice(0, regionLabels.length)
+    }]
   };
   const doughnutData = pieData;
   const radarData = lineData;
   const polarData = pieData;
   const scatterData = {
     datasets: [{
-      label: 'Scatter',
-      data: numbers.map((n) => ({ x: n, y: Math.random() * 10 })),
+      label: 'Surface vs Rendement',
+      data: stats.map(it => ({ x: it.surfaceHa, y: it.yieldQxHa })),
       backgroundColor: 'rgb(255,99,132)'
     }]
   };
   const bubbleData = {
     datasets: [{
-      label: 'Bubble',
-      data: numbers.map((n) => ({ x: n, y: Math.random() * 10, r: 5 + Math.random() * 10 })) as BubbleDataPoint[],
+      label: 'Production',
+      data: stats.map(it => ({ x: it.surfaceHa, y: it.yieldQxHa, r: Math.sqrt(it.productionT || 0) })) as BubbleDataPoint[],
       backgroundColor: 'rgba(53,162,235,0.5)'
     }]
   };
