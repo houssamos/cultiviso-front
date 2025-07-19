@@ -75,6 +75,38 @@ export default function CarteComponent() {
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
+  function showHoverInfo(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+    const feature = e.features?.[0];
+    if (!feature) return;
+
+    const props = feature.properties;
+    setHoverInfo({
+      regionName: props.regionName,
+      surfaceHa: props.surfaceHa,
+      yieldQxHa: props.yieldQxHa,
+      productionT: props.productionT
+    });
+
+    if (mapRef.current.getLayer('hover-outline')) mapRef.current.removeLayer('hover-outline');
+    if (mapRef.current.getSource('hover')) mapRef.current.removeSource('hover');
+
+    mapRef.current.addSource('hover', {
+      type: 'geojson',
+      data: feature
+    });
+
+    mapRef.current.addLayer({
+      id: 'hover-outline',
+      type: 'line',
+      source: 'hover',
+      paint: {
+        'line-color': '#000',
+        'line-width': 3,
+        'line-opacity': 0.6
+      }
+    });
+  }
+
   useEffect(() => {
     fetch(`${API_BASE}/v1/cultures`, {
       headers: { 'X-api-key': `${API_KEY}` },
@@ -141,37 +173,9 @@ export default function CarteComponent() {
           },
         });
 
-        map.on('mousemove', 'choropleth', (e) => {
-          const feature = e.features?.[0];
-          if (!feature) return;
-
-          const props = feature.properties;
-          setHoverInfo({
-            regionName: props.regionName,
-            surfaceHa: props.surfaceHa,
-            yieldQxHa: props.yieldQxHa,
-            productionT: props.productionT
-          });
-
-          if (map.getLayer('hover-outline')) map.removeLayer('hover-outline');
-          if (map.getSource('hover')) map.removeSource('hover');
-
-          map.addSource('hover', {
-            type: 'geojson',
-            data: feature
-          });
-
-          map.addLayer({
-            id: 'hover-outline',
-            type: 'line',
-            source: 'hover',
-            paint: {
-              'line-color': '#000',
-              'line-width': 3,
-              'line-opacity': 0.6
-            }
-          });
-        });
+        map.on('touchstart', 'choropleth', e => showHoverInfo(e));
+        map.on('mousemove', 'choropleth', e => showHoverInfo(e));
+        map.on('click', 'choropleth', e => showHoverInfo(e));
 
         map.on('mouseleave', 'choropleth', () => {
           setHoverInfo(null);
