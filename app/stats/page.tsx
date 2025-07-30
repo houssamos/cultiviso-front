@@ -36,14 +36,21 @@ ChartJS.register(
 interface Culture {
   id: string;
   name: string;
+  code: string
+}
+
+interface Region {
+  id: string;
+  name: string;
+  code: string
 }
 
 interface StatItem {
   id: string;
   year: number;
-  regionId?: string;
+  region?: Region;
   regionName?: string;
-  cultureId: string;
+  culture: Culture;
   surfaceHa: number;
   yieldQxHa: number;
   productionT: number;
@@ -52,10 +59,10 @@ interface StatItem {
 export default function StatsPage() {
   const [cultures, setCultures] = useState<Culture[]>([]);
   const [years, setYears] = useState<number[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
   const [selectedYear, setSelectedYear] = useState<number>();
   const [selectedCulture, setSelectedCulture] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
-  const [granularity, setGranularity] = useState<string>('region');
   const [stats, setStats] = useState<StatItem[]>([]);
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
@@ -74,6 +81,13 @@ export default function StatsPage() {
       .then((res) => res.json())
       .then(setYears)
       .catch(console.error);
+    
+    fetch(`${API_BASE}/v1/regions`, {
+      headers: { 'X-api-key': API_KEY || '' }
+    })
+      .then((res) => res.json())
+      .then(setRegions)
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -81,17 +95,19 @@ export default function StatsPage() {
     if (selectedYear) params.append('year', String(selectedYear));
     if (selectedCulture) params.append('cultureId', selectedCulture);
     if (selectedRegion) params.append('regionId', selectedRegion);
-    params.append('granularity', granularity);
     params.append('page', '1');
-    params.append('limit', '100');
+    params.append('limit', '10000');
 
     fetch(`${API_BASE}/v1/stats?${params.toString()}`, {
       headers: { 'X-api-key': API_KEY || '' }
     })
       .then(res => res.json())
-      .then((data: StatItem[]) => setStats(data))
+      .then(data => {
+        const items = Array.isArray(data) ? data : data.items ?? data.data ?? [];
+        setStats(items);
+      })
       .catch(console.error);
-  }, [selectedYear, selectedCulture, selectedRegion, granularity]);
+  }, [selectedYear, selectedCulture, selectedRegion /*, granularity*/]);
 
   const yearMap = stats.reduce<Record<number, StatItem[]>>((acc, item) => {
     if (!acc[item.year]) acc[item.year] = [];
@@ -104,17 +120,17 @@ export default function StatsPage() {
     const avg = arr.reduce((s, it) => s + it.yieldQxHa, 0) / (arr.length || 1);
     return Number(avg.toFixed(2));
   });
-  const surfaces = yearLabels.map(y =>
-    yearMap[Number(y)].reduce((s, it) => s + it.surfaceHa, 0)
+  const surfaces = yearLabels.map(yearLabel =>
+    yearMap[Number(yearLabel)].reduce((s, it) => s + it.surfaceHa, 0)
   );
 
   const regionMap = stats.reduce<Record<string, number>>((acc, item) => {
-    const key = item.regionName || item.regionId || 'N/A';
+    const key = item.region.name || item.region.id || 'N/A';
     acc[key] = (acc[key] || 0) + item.productionT;
     return acc;
   }, {});
   const regionLabels = Object.keys(regionMap);
-  const productions = regionLabels.map(r => regionMap[r]);
+  const productions = regionLabels.map(regionLabel => regionMap[regionLabel]);
 
   const colors = ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40'];
 
@@ -194,21 +210,12 @@ export default function StatsPage() {
           aria-label="Filtrer par région"
         >
           <option value="">Région</option>
-          <option value="idf">Île-de-France</option>
-          <option value="na">Nouvelle-Aquitaine</option>
-        </select>
-        <select
-          value={granularity}
-          onChange={(e) => setGranularity(e.target.value)}
-          className="border px-2 py-1 rounded"
-          aria-label="Filtrer par granularité"
-        >
-          <option value="region">Région</option>
-          <option value="departement">Département</option>
-          <option value="commune">Commune</option>
+          {regions.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
         </select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-3">
         <Line data={lineData} />
         <Bar data={barData} />
         <Pie data={pieData} />
@@ -218,7 +225,7 @@ export default function StatsPage() {
         <Scatter data={scatterData} />
         <Bubble data={bubbleData} />
         <Bar data={barData} options={{ indexAxis: 'y' as const }} />
+        </div>
       </div>
-    </div>
   );
 }
