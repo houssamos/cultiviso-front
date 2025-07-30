@@ -19,6 +19,8 @@ import {
 import { Line, Bar, Pie, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs-2';
 import { API_BASE } from '@/lib/api';
 import ChartTabs, { TabOption } from '@/components/pages/stats/ChartTabs';
+import IndicatorTabs, { IndicatorTabOption } from '@/components/pages/stats/IndicatorTabs';
+import { FiLayers, FiTrendingUp, FiPackage } from 'react-icons/fi';
 
 ChartJS.register(
   CategoryScale,
@@ -66,6 +68,7 @@ export default function StatsPage() {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [stats, setStats] = useState<StatItem[]>([]);
   const [selectedChart, setSelectedChart] = useState<string>('line');
+  const [selectedIndicator, setSelectedIndicator] = useState<'surfaceHa' | 'yieldQxHa' | 'productionT'>('surfaceHa');
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -125,22 +128,49 @@ export default function StatsPage() {
   const surfaces = yearLabels.map(yearLabel =>
     yearMap[Number(yearLabel)].reduce((s, it) => s + it.surfaceHa, 0)
   );
+  const productionsByYear = yearLabels.map(yearLabel =>
+    yearMap[Number(yearLabel)].reduce((s, it) => s + it.productionT, 0)
+  );
 
-  const regionMap = stats.reduce<Record<string, number>>((acc, item) => {
-    const key = item.region.name || item.region.id || 'N/A';
-    acc[key] = (acc[key] || 0) + item.productionT;
+  const regionMap = stats.reduce<Record<string, {surface: number; yieldSum: number; yieldCount: number; production: number}>>((acc, item) => {
+    const key = item.region.name || item.region.id || item.regionName || 'N/A';
+    if (!acc[key]) acc[key] = { surface: 0, yieldSum: 0, yieldCount: 0, production: 0 };
+    acc[key].surface += item.surfaceHa;
+    acc[key].yieldSum += item.yieldQxHa;
+    acc[key].yieldCount += 1;
+    acc[key].production += item.productionT;
     return acc;
   }, {});
   const regionLabels = Object.keys(regionMap);
-  const productions = regionLabels.map(regionLabel => regionMap[regionLabel]);
+  const surfacesRegion = regionLabels.map(r => regionMap[r].surface);
+  const yieldsRegion = regionLabels.map(r => Number((regionMap[r].yieldSum / regionMap[r].yieldCount).toFixed(2)));
+  const productionsRegion = regionLabels.map(r => regionMap[r].production);
 
   const colors = ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40'];
+
+  const indicatorLabel = selectedIndicator === 'surfaceHa'
+    ? 'Surface (ha)'
+    : selectedIndicator === 'yieldQxHa'
+      ? 'Rendement (q/ha)'
+      : 'Production (q)';
+
+  const yearValues = selectedIndicator === 'surfaceHa'
+    ? surfaces
+    : selectedIndicator === 'yieldQxHa'
+      ? yields
+      : productionsByYear;
+
+  const regionValues = selectedIndicator === 'surfaceHa'
+    ? surfacesRegion
+    : selectedIndicator === 'yieldQxHa'
+      ? yieldsRegion
+      : productionsRegion;
 
   const lineData = {
     labels: yearLabels,
     datasets: [{
-      label: 'Rendement (q/ha)',
-      data: yields,
+      label: indicatorLabel,
+      data: yearValues,
       borderColor: 'rgb(75,192,192)',
       backgroundColor: 'rgba(75,192,192,0.2)'
     }]
@@ -149,8 +179,8 @@ export default function StatsPage() {
   const barData = {
     labels: yearLabels,
     datasets: [{
-      label: 'Surface (ha)',
-      data: surfaces,
+      label: indicatorLabel,
+      data: yearValues,
       backgroundColor: 'rgba(53,162,235,0.5)'
     }]
   };
@@ -158,7 +188,7 @@ export default function StatsPage() {
   const pieData = {
     labels: regionLabels,
     datasets: [{
-      data: productions,
+      data: regionValues,
       backgroundColor: colors.slice(0, regionLabels.length)
     }]
   };
@@ -190,6 +220,12 @@ export default function StatsPage() {
     { id: 'scatter', label: 'Nuage' },
     { id: 'bubble', label: 'Bulles' },
     { id: 'barh', label: 'Barres H' },
+  ];
+
+  const indicatorTabs: IndicatorTabOption[] = [
+    { id: 'surfaceHa', label: 'Surface', icon: FiLayers },
+    { id: 'yieldQxHa', label: 'Rendement', icon: FiTrendingUp },
+    { id: 'productionT', label: 'Production', icon: FiPackage },
   ];
 
   return (
@@ -229,17 +265,26 @@ export default function StatsPage() {
           ))}
         </select>
       </div>
-      <ChartTabs tabs={chartTabs} selected={selectedChart} onSelect={setSelectedChart} />
-      <div className="w-full max-w-3xl mx-auto">
-        {selectedChart === 'line' && <Line data={lineData} />}
-        {selectedChart === 'bar' && <Bar data={barData} />}
-        {selectedChart === 'pie' && <Pie data={pieData} />}
-        {selectedChart === 'doughnut' && <Doughnut data={doughnutData} />}
-        {selectedChart === 'radar' && <Radar data={radarData} />}
-        {selectedChart === 'polar' && <PolarArea data={polarData} />}
-        {selectedChart === 'scatter' && <Scatter data={scatterData} />}
-        {selectedChart === 'bubble' && <Bubble data={bubbleData} />}
-        {selectedChart === 'barh' && <Bar data={barData} options={{ indexAxis: 'y' as const }} />}
+      <div className="flex gap-4">
+        <IndicatorTabs
+          tabs={indicatorTabs}
+          selected={selectedIndicator}
+          onSelect={setSelectedIndicator}
+        />
+        <div className="flex-1">
+          <ChartTabs tabs={chartTabs} selected={selectedChart} onSelect={setSelectedChart} />
+          <div className="w-full max-w-3xl mx-auto">
+            {selectedChart === 'line' && <Line data={lineData} />}
+            {selectedChart === 'bar' && <Bar data={barData} />}
+            {selectedChart === 'pie' && <Pie data={pieData} />}
+            {selectedChart === 'doughnut' && <Doughnut data={doughnutData} />}
+            {selectedChart === 'radar' && <Radar data={radarData} />}
+            {selectedChart === 'polar' && <PolarArea data={polarData} />}
+            {selectedChart === 'scatter' && <Scatter data={scatterData} />}
+            {selectedChart === 'bubble' && <Bubble data={bubbleData} />}
+            {selectedChart === 'barh' && <Bar data={barData} options={{ indexAxis: 'y' as const }} />}
+          </div>
+        </div>
       </div>
     </div>
   );
