@@ -18,6 +18,7 @@ import {
 } from 'chart.js';
 import { Line, Bar, Pie, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs-2';
 import { API_BASE } from '@/lib/api';
+import ChartTabs, { TabOption } from '@/components/pages/stats/ChartTabs';
 
 ChartJS.register(
   CategoryScale,
@@ -64,6 +65,7 @@ export default function StatsPage() {
   const [selectedCulture, setSelectedCulture] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [stats, setStats] = useState<StatItem[]>([]);
+  const [selectedChart, setSelectedChart] = useState<string>('line');
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -178,6 +180,18 @@ export default function StatsPage() {
     }]
   };
 
+  const chartTabs: TabOption[] = [
+    { id: 'line', label: 'Ligne' },
+    { id: 'bar', label: 'Barres' },
+    { id: 'pie', label: 'Secteurs' },
+    { id: 'doughnut', label: 'Donut' },
+    { id: 'radar', label: 'Radar' },
+    { id: 'polar', label: 'Polar' },
+    { id: 'scatter', label: 'Nuage' },
+    { id: 'bubble', label: 'Bulles' },
+    { id: 'barh', label: 'Barres H' },
+  ];
+
   return (
     <div className="p-4 space-y-8">
       <div className="flex flex-wrap gap-4">
@@ -215,17 +229,18 @@ export default function StatsPage() {
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-3">
-        <Line data={lineData} />
-        <Bar data={barData} />
-        <Pie data={pieData} />
-        <Doughnut data={doughnutData} />
-        <Radar data={radarData} />
-        <PolarArea data={polarData} />
-        <Scatter data={scatterData} />
-        <Bubble data={bubbleData} />
-        <Bar data={barData} options={{ indexAxis: 'y' as const }} />
-        </div>
+      <ChartTabs tabs={chartTabs} selected={selectedChart} onSelect={setSelectedChart} />
+      <div className="w-full max-w-3xl mx-auto">
+        {selectedChart === 'line' && <Line data={lineData} />}
+        {selectedChart === 'bar' && <Bar data={barData} />}
+        {selectedChart === 'pie' && <Pie data={pieData} />}
+        {selectedChart === 'doughnut' && <Doughnut data={doughnutData} />}
+        {selectedChart === 'radar' && <Radar data={radarData} />}
+        {selectedChart === 'polar' && <PolarArea data={polarData} />}
+        {selectedChart === 'scatter' && <Scatter data={scatterData} />}
+        {selectedChart === 'bubble' && <Bubble data={bubbleData} />}
+        {selectedChart === 'barh' && <Bar data={barData} options={{ indexAxis: 'y' as const }} />}
       </div>
+    </div>
   );
 }
