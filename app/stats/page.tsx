@@ -209,7 +209,7 @@ export default function StatsPage() {
         <select
           value={selectedCulture}
           onChange={(e) => setSelectedCulture(e.target.value)}
-          className="border px-2 py-1 rounded"
+          className="border px-2 py-1 rounded max-w-[80vw]"
           aria-label="Filtrer par culture"
         >
           <option value="">Culture</option>

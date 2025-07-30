@@ -15,7 +15,7 @@ interface ChartTabsProps {
 
 export default function ChartTabs({ tabs, selected, onSelect }: ChartTabsProps) {
   return (
-    <div className="flex gap-2 border-b mb-4 overflow-x-auto">
+    <div className="flex flex-wrap gap-2 border-b mb-4">
       {tabs.map(tab => (
         <button
           key={tab.id}
