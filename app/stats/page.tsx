@@ -14,7 +14,8 @@ import {
   Tooltip,
   Legend,
   BubbleDataPoint,
-  Filler
+  Filler,
+  BubbleController
 } from 'chart.js';
 import { Line, Bar, Pie, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs-2';
 import { API_BASE } from '@/lib/api';
@@ -31,6 +32,7 @@ ChartJS.register(
   ArcElement,
   RadialLinearScale,
   RadarController,
+  BubbleController,
   Tooltip,
   Legend,
   Filler
@@ -202,13 +204,30 @@ export default function StatsPage() {
       backgroundColor: 'rgb(255,99,132)'
     }]
   };
+
+  // Bubble chart data
+  const minR = 4;
+  const maxR = 30;
+  const prodList = stats.map(it => it.productionT).filter(v => typeof v === 'number' && !isNaN(v));
+  const minProd = Math.min(...prodList);
+  const maxProd = Math.max(...prodList);
+  const bubblePoints = stats.map(it => {
+    let r = minR;
+    if (typeof it.productionT === 'number' && !isNaN(it.productionT)) {
+      if (maxProd > minProd) {
+        r = minR + (maxR - minR) * ((it.productionT - minProd) / (maxProd - minProd));
+      }
+    }
+    return { x: it.surfaceHa, y: it.yieldQxHa, r: Number(r.toFixed(2)) } as BubbleDataPoint;
+  });
+  
   const bubbleData = {
-    datasets: [{
-      label: 'Production',
-      data: stats.map(it => ({ x: it.surfaceHa, y: it.yieldQxHa, r: Math.sqrt(it.productionT || 0) })) as BubbleDataPoint[],
-      backgroundColor: 'rgba(53,162,235,0.5)'
-    }]
-  };
+  datasets: [{
+    label: 'Production',
+    data: bubblePoints,
+    backgroundColor: 'rgba(53,162,235,0.5)'
+  }]
+};
 
   const chartTabs: TabOption[] = [
     { id: 'line', label: 'Ligne' },
@@ -265,15 +284,15 @@ export default function StatsPage() {
           ))}
         </select>
       </div>
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         <IndicatorTabs
           tabs={indicatorTabs}
           selected={selectedIndicator}
-          onSelect={setSelectedIndicator}
+          onSelect={(id) => setSelectedIndicator(id as 'surfaceHa' | 'yieldQxHa' | 'productionT')}
         />
         <div className="flex-1">
           <ChartTabs tabs={chartTabs} selected={selectedChart} onSelect={setSelectedChart} />
-          <div className="w-full max-w-3xl mx-auto">
+          <div className="w-full max-w-3xl">
             {selectedChart === 'line' && <Line data={lineData} />}
             {selectedChart === 'bar' && <Bar data={barData} />}
             {selectedChart === 'pie' && <Pie data={pieData} />}

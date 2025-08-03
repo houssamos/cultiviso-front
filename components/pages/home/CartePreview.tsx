@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import maplibregl from 'maplibre-gl';
+import maplibregl, { ExpressionSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { API_BASE } from '@/lib/api';
 
@@ -17,8 +17,8 @@ function computeThresholds(values: number[], steps: number = 6): number[] {
   return Array.from({ length: steps - 1 }, (_, i) => tick * (i + 1));
 }
 
-function generateStepExpression(indicator: string, thresholds: number[], colors: string[]) {
-  const step: any[] = ['step', ['get', indicator], colors[0]];
+function generateStepExpression(indicator: string, thresholds: number[], colors: string[]): ExpressionSpecification {
+  const step: ExpressionSpecification = ['step', ['get', indicator], colors[0]];
   thresholds.forEach((t, i) => step.push(t, colors[i + 1]));
   return step;
 }

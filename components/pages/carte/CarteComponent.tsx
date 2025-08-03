@@ -1,16 +1,11 @@
 // components/pages/carte/CarteComponent.tsx
 'use client';
 
-import FooterNav from '@/components/layout/FooterNav';
 import CarteLegend from '@/components/pages/carte/CarteLegend';
-import maplibregl from 'maplibre-gl';
+import maplibregl, {ExpressionSpecification} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef, useState } from 'react';
-import bbox from '@turf/bbox';
-import booleanOverlap from '@turf/boolean-overlap';
-import * as turf from '@turf/helpers';
 import { API_BASE } from '@/lib/api';
-
 
 interface Culture {
   id: string;
@@ -28,8 +23,8 @@ function computeThresholds(values: number[], steps: number = 6): number[] {
   return Array.from({ length: steps - 1 }, (_, i) => tick * (i + 1));
 }
 
-function generateStepExpression(indicator: string, thresholds: number[], colors: string[]) {
-  const step: any[] = ['step', ['get', indicator], colors[0]];
+function generateStepExpression(indicator: string, thresholds: number[], colors: string[]): ExpressionSpecification {
+  const step: ExpressionSpecification = ['step', ['get', indicator], colors[0]];
   thresholds.forEach((t, i) => step.push(t, colors[i + 1]));
   return step;
 }
@@ -76,7 +71,8 @@ export default function CarteComponent() {
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
   function showHoverInfo(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
-    const feature = e.features?.[0];
+    const features = mapRef.current.queryRenderedFeatures(e.point);
+    const feature = features[0];
     if (!feature) return;
 
     const props = feature.properties;

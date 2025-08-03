@@ -37,7 +37,7 @@ export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
 
       <div className="hidden md:flex items-center gap-4">
         <Link href="/login" className="text-sm font-medium text-green-800 hover:underline">Connexion</Link>
-        <Link href="/signup" className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800">Créer un compte</Link>
+        <Link href="/signup" className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800">S'inscrire</Link>
       </div>
 
       {/* Mobile Menu Button */}

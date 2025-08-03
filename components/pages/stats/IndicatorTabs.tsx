@@ -23,7 +23,7 @@ export default function IndicatorTabs({ tabs, selected, onSelect }: IndicatorTab
           key={id}
           onClick={() => onSelect(id)}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 border-l-4 rounded-l-md text-sm',
+            'flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 text-sm border-b-4 md:border-b-0 md:border-l-4 rounded-b-md md:rounded-l-md',
             selected === id ? 'bg-white border-primary font-semibold' : 'bg-gray-100 border-transparent'
           )}
         >

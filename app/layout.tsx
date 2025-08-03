@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               className="bg-green-700 text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-green-800"
               onClick={() => setMenuOpen(false)}
             >
-              Créer un compte
+              S'inscrire
             </Link>
           </div>
         </div>
