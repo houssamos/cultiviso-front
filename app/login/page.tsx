@@ -4,8 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { FcGoogle } from 'react-icons/fc';
-import { FaApple, FaFacebookF } from 'react-icons/fa';
+import { SocialLoginButtons } from '@/components/ui/social-login-buttons';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,17 +65,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-600 mt-4">ou continuer avec</p>
 
-        <div className="flex justify-center gap-4 mt-4">
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FcGoogle size={20} /> Google
-          </button>
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FaApple size={20} /> Apple
-          </button>
-          <button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FaFacebookF size={20} className="text-blue-600" /> Facebook
-          </button>
-        </div>
+        <SocialLoginButtons />
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Vous n’avez pas de compte ? <a href="/signup" className="text-green-700 font-medium hover:underline">Créer un compte</a>
