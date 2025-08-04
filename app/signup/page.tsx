@@ -3,6 +3,10 @@
 
 import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import {
+  GoogleReCaptchaProvider,
+  GoogleReCaptcha
+} from 'react-google-recaptcha-v3';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -22,12 +26,31 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
     try {
+        if (!recaptchaToken) {
+          setError('Veuillez compléter le reCAPTCHA');
+          return;
+        }
+
+        const verify = await fetch(`${API_BASE}/v1/recaptcha`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recaptchaToken }),
+        });
+
+        if (!verify.ok) {
+          setError('Vérification reCAPTCHA échouée');
+          return;
+        }
+        if (!firstName || !lastName || !email || !password) {
+          setError('Veuillez remplir tous les champs');
+          return;
+        }
         const res = await fetch(`${API_BASE}/v1/auth/register`, {
             method: 'POST',
             headers: { 'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-api-key': `${API_KEY}` },
-            body: JSON.stringify({ firstName, lastName, email, password, recaptchaToken }),
+            body: JSON.stringify({ firstName, lastName, email, password }),
         });
 
       if (res.ok) {
