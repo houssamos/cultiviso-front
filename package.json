@@ -9,16 +9,16 @@
   "dependencies": {
     "@turf/bbox": "^7.2.0",
     "@turf/boolean-overlap": "^7.2.0",
+    "chart.js": "^4.4.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "maplibre-gl": "^5.6.0",
     "next": "13.4.12",
     "react": "18.2.0",
+    "react-chartjs-2": "^5.0.0",
     "react-dom": "18.2.0",
-    "react-icons": "^5.5.0",
     "react-google-recaptcha": "^2.1.0",
-    "chart.js": "^4.4.0",
-    "react-chartjs-2": "^5.0.0"
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@types/react": "19.1.8",

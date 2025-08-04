@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { SocialLoginButtons } from '@/components/ui/social-login-buttons';
-import { API_BASE, API_KEY } from '@/lib/api';
+import { API_BASE, API_KEY, RECAPTCHA_SITE_KEY } from '@/lib/api';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -98,7 +98,7 @@ export default function SignupPage() {
           {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
           <ReCAPTCHA
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+            sitekey={RECAPTCHA_SITE_KEY || ''}
             onChange={(token) => setRecaptchaToken(token)}
             className="mt-4"
           />

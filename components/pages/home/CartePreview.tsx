@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import maplibregl, { ExpressionSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { API_BASE } from '@/lib/api';
+import { API_BASE, API_KEY } from '@/lib/api';
 
 interface Culture {
   id: string;
@@ -44,8 +44,6 @@ export default function CartePreview() {
       ],
       { padding: 0, duration: 0 }
     );
-
-    const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
     async function fetchAndRender() {
       try {
