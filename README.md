@@ -25,6 +25,7 @@ Create a `.env.local` file in the project root and set these variables:
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
 NEXT_PUBLIC_API_KEY=your_api_key_if_required
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
 These values are read at runtime to build API requests.

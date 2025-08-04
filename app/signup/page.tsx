@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export default function SignupPage() {
             headers: { 'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-api-key': `${API_KEY}` },
-            body: JSON.stringify({ firstName, lastName, email, password }),
+            body: JSON.stringify({ firstName, lastName, email, password, recaptchaToken }),
         });
 
       if (res.ok) {
@@ -94,6 +96,12 @@ export default function SignupPage() {
           </div>
 
           {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
+
+          <ReCAPTCHA
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+            onChange={(token) => setRecaptchaToken(token)}
+            className="mt-4"
+          />
 
           <Button
             type="submit"
