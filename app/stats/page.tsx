@@ -18,7 +18,7 @@ import {
   BubbleController
 } from 'chart.js';
 import { Line, Bar, Pie, Doughnut, Radar, PolarArea, Scatter, Bubble } from 'react-chartjs-2';
-import { API_BASE } from '@/lib/api';
+import { API_BASE, API_KEY } from '@/lib/api';
 import ChartTabs, { TabOption } from '@/components/pages/stats/ChartTabs';
 import IndicatorTabs, { IndicatorTabOption } from '@/components/pages/stats/IndicatorTabs';
 import { FiLayers, FiTrendingUp, FiPackage } from 'react-icons/fi';
@@ -71,8 +71,6 @@ export default function StatsPage() {
   const [stats, setStats] = useState<StatItem[]>([]);
   const [selectedChart, setSelectedChart] = useState<string>('line');
   const [selectedIndicator, setSelectedIndicator] = useState<'surfaceHa' | 'yieldQxHa' | 'productionT'>('surfaceHa');
-
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
   useEffect(() => {
     fetch(`${API_BASE}/v1/cultures`, {

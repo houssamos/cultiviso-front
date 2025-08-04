@@ -5,7 +5,7 @@ import CarteLegend from '@/components/pages/carte/CarteLegend';
 import maplibregl, {ExpressionSpecification} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef, useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { API_BASE, API_KEY } from '@/lib/api';
 
 interface Culture {
   id: string;
@@ -67,8 +67,6 @@ export default function CarteComponent() {
   const [thresholds, setThresholds] = useState<number[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [hoverInfo, setHoverInfo] = useState<{ regionName: string, surfaceHa: number, yieldQxHa: number, productionT: number } | null>(null);
-
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
   function showHoverInfo(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
     const features = mapRef.current.queryRenderedFeatures(e.point);

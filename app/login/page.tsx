@@ -4,9 +4,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { FcGoogle } from 'react-icons/fc';
-import { FaApple, FaFacebookF } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
+import { SocialLoginButtons } from '@/components/ui/social-login-buttons';
+import { API_BASE, API_KEY } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,15 +16,31 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setError('');
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs');
+      return;
+    }
+
     try {
-      // Fake login logic placeholder
-      if (email && password) {
+     const res = await fetch(`${API_BASE}/v1/auth/login`, {
+       method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+            'X-api-key': `${API_KEY}` },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
         router.push('/dashboard');
       } else {
-        setError('Veuillez remplir tous les champs');
+        setError(data.message || 'Échec de la connexion');
       }
     } catch (err) {
-      setError("Échec de la connexion");
+      setError('Échec de la connexion');
     }
   };
 
@@ -69,17 +85,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-600 mt-4">ou continuer avec</p>
 
-        <div className="flex justify-center gap-4 mt-4">
-          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FcGoogle size={20} /> Google
-          </Button>
-          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FaApple size={20} /> Apple
-          </Button>
-          <Button className="border px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-50">
-            <FaFacebookF size={20} className="text-blue-600" /> Facebook
-          </Button>
-        </div>
+       <SocialLoginButtons />
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Vous n’avez pas de compte ? <a href="/signup" className="text-green-700 font-medium hover:underline">Créer un compte</a>
