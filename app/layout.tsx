@@ -6,6 +6,8 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import Header, { NAV_ITEMS } from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { RECAPTCHA_SITE_KEY } from '@/lib/api';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,7 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
           </div>
         </div>
+            <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_SITE_KEY}>
         <div className="pt-20 min-h-screen flex flex-col">{children}</div>
+        </GoogleReCaptchaProvider>
         <Footer />
       </body>
     </html>

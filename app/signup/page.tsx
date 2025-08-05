@@ -5,7 +5,8 @@ import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {
   GoogleReCaptchaProvider,
-  GoogleReCaptcha
+  GoogleReCaptcha,
+  useGoogleReCaptcha
 } from 'react-google-recaptcha-v3';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -20,20 +21,28 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
-        if (!recaptchaToken) {
-          setError('Veuillez compléter le reCAPTCHA');
-          return;
-        }
+      if (!executeRecaptcha) {
+        setError('reCAPTCHA non prêt');
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('signup');
+      if (!recaptchaToken) {
+        setError('Échec reCAPTCHA');
+        return;
+      }
 
         const verify = await fetch(`${API_BASE}/v1/recaptcha`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+            'X-api-key': `${API_KEY}`
+           },
           body: JSON.stringify({ recaptchaToken }),
         });
 
@@ -119,12 +128,6 @@ export default function SignupPage() {
           </div>
 
           {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
-
-          <ReCAPTCHA
-            sitekey={RECAPTCHA_SITE_KEY || ''}
-            onChange={(token) => setRecaptchaToken(token)}
-            className="mt-4"
-          />
 
           <Button
             type="submit"
