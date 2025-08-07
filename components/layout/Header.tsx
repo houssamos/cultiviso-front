@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export const NAV_ITEMS = [
   { label: 'Accueil', href: '/' },
@@ -19,6 +21,20 @@ interface HeaderProps {
 }
 
 export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    setIsAuthenticated(!!token);
+  }, [pathname]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    window.location.reload();
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-[#f7f1e4]">
       <div className="flex items-center gap-3">
@@ -36,8 +52,31 @@ export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
       </nav>
 
       <div className="hidden md:flex items-center gap-4">
-        <Link href="/login" className="text-sm font-medium text-green-800 hover:underline">Connexion</Link>
-        <Link href="/signup" className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800">S'inscrire</Link>
+        {isAuthenticated ? (
+          <>
+            <Link href="/dashboard" className="text-sm font-medium text-green-800 hover:underline">
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/login" className="text-sm font-medium text-green-800 hover:underline">
+              Connexion
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800"
+            >
+              S'inscrire
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Button */}
