@@ -22,6 +22,7 @@ import { API_BASE, API_KEY } from '@/lib/api';
 import ChartTabs, { TabOption } from '@/components/pages/stats/ChartTabs';
 import IndicatorTabs, { IndicatorTabOption } from '@/components/pages/stats/IndicatorTabs';
 import { FiLayers, FiTrendingUp, FiPackage } from 'react-icons/fi';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 ChartJS.register(
   CategoryScale,
@@ -61,7 +62,7 @@ interface StatItem {
   productionT: number;
 }
 
-export default function StatsPage() {
+function StatsContent() {
   const [cultures, setCultures] = useState<Culture[]>([]);
   const [years, setYears] = useState<number[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -304,5 +305,13 @@ export default function StatsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StatsPage() {
+  return (
+    <ProtectedRoute>
+      <StatsContent />
+    </ProtectedRoute>
   );
 }
