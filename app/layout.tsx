@@ -1,16 +1,31 @@
 'use client';
 
 import '../styles/globals.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import Header, { NAV_ITEMS } from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { RECAPTCHA_SITE_KEY } from '@/lib/api';
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    setIsAuthenticated(!!token);
+  }, [pathname]);
+    
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    window.location.reload();
+  };
 
   return (
     <html lang="fr">
@@ -29,7 +44,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
             ))}
           </nav>
-          <div className="flex flex-col items-center gap-2 mt-6">
+           {isAuthenticated ? (
+             <>
+           <div className="flex flex-col items-center gap-2 mt-6">
+            <Link href="/dashboard" className="text-green-800 text-sm font-medium" onClick={() => setMenuOpen(false)}>
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-green-700 text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-green-800"
+            >
+              Déconnexion
+            </button>
+        </div>
+          </>
+          ) : (
+            <>
+            <div className="flex flex-col items-center gap-2 mt-6">
             <Link href="/login" className="text-green-800 text-sm font-medium" onClick={() => setMenuOpen(false)}>
               Connexion
             </Link>
@@ -41,7 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               S'inscrire
             </Link>
           </div>
-        </div>
+        </>
+         )}
+         </div>
             <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_SITE_KEY}>
         <div className="pt-20 min-h-screen flex flex-col">{children}</div>
         </GoogleReCaptchaProvider>
