@@ -60,6 +60,26 @@ export default function DashboardPage() {
         }
       })
       .catch(console.error);
+
+    fetch(`${API_BASE}/v1/notifications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-api-key': API_KEY || '',
+      },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch notifications');
+        }
+        return res.json();
+      })
+      .then(data => {
+        setNotifyStats(!!data?.stats);
+        setNotifyMarketplace(!!data?.marketplace);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }, [router]);
 
   const handleLogout = () => {
