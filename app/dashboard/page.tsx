@@ -21,6 +21,8 @@ export default function DashboardPage() {
   const [userCount, setUserCount] = useState<number | null>(null);
   const [notifyStats, setNotifyStats] = useState(false);
   const [notifyMarketplace, setNotifyMarketplace] = useState(false);
+  const [savingNotifications, setSavingNotifications] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -116,8 +118,10 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
+    setSavingNotifications(true);
+    setSaveMessage(null);
     try {
-      await fetch(`${API_BASE}/v1/notifications/subscribe`, {
+      const res = await fetch(`${API_BASE}/v1/notifications/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,8 +133,16 @@ export default function DashboardPage() {
           marketplace: notifyMarketplace,
         }),
       });
+      if (res.ok) {
+        setSaveMessage({ type: 'success', text: 'Préférences enregistrées.' });
+      } else {
+        setSaveMessage({ type: 'error', text: "Une erreur est survenue." });
+      }
     } catch (err) {
       console.error(err);
+      setSaveMessage({ type: 'error', text: "Une erreur est survenue." });
+    } finally {
+      setSavingNotifications(false);
     }
   };
 
@@ -208,7 +220,14 @@ export default function DashboardPage() {
             />
             <span>Lancement du marketplace</span>
           </label>
-          <Button onClick={handleSaveNotifications}>Enregistrer</Button>
+          <Button onClick={handleSaveNotifications} disabled={savingNotifications}>
+            {savingNotifications ? 'Enregistrement...' : 'Enregistrer'}
+          </Button>
+          {saveMessage && (
+            <p className={saveMessage.type === 'error' ? 'text-red-600' : 'text-green-600'}>
+              {saveMessage.text}
+            </p>
+          )}
         </div>
       </section>
 
