@@ -97,7 +97,7 @@ export default function DashboardPage() {
       return;
     }
     try {
-      await fetch(`${API_BASE}/v1/notifications`, {
+      await fetch(`${API_BASE}/v1/notifications/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
