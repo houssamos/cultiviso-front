@@ -133,14 +133,21 @@ export default function DashboardPage() {
           marketplace: notifyMarketplace,
         }),
       });
+      const data = await res.json().catch(() => null);
       if (res.ok) {
-        setSaveMessage({ type: 'success', text: 'Préférences enregistrées.' });
+        setSaveMessage({
+          type: 'success',
+          text: data?.message || 'Préférences enregistrées.',
+        });
       } else {
-        setSaveMessage({ type: 'error', text: "Une erreur est survenue." });
+        setSaveMessage({
+          type: 'error',
+          text: data?.message || 'Une erreur est survenue.',
+        });
       }
     } catch (err) {
       console.error(err);
-      setSaveMessage({ type: 'error', text: "Une erreur est survenue." });
+      setSaveMessage({ type: 'error', text: 'Une erreur est survenue.' });
     } finally {
       setSavingNotifications(false);
     }
