@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminRoute from '@/components/auth/AdminRoute';
 import { API_BASE, API_KEY } from '@/lib/api';
 
 interface User {
@@ -40,7 +40,7 @@ export default function AdminUsersPage() {
   const hasNext = users.length === limit; // naive check
 
   return (
-    <ProtectedRoute>
+    <AdminRoute>
       <div className="p-4 space-y-4">
         <h1 className="text-2xl font-bold mb-4">Utilisateurs</h1>
         <div className="overflow-x-auto">
@@ -111,6 +111,6 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </AdminRoute>
   );
 }
