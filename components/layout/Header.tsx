@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { API_BASE, API_KEY } from '@/lib/api';
 
 export const NAV_ITEMS = [
   { label: 'Accueil', href: '/' },
@@ -22,16 +23,34 @@ interface HeaderProps {
 
 export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     setIsAuthenticated(!!token);
+
+    if (token) {
+      fetch(`${API_BASE}/v1/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-api-key': API_KEY || '',
+        },
+      })
+        .then(res => (res.ok ? res.json() : null))
+        .then(data => {
+          setIsAdmin(data?.role === 'admin' || data?.isAdmin);
+        })
+        .catch(() => setIsAdmin(false));
+    } else {
+      setIsAdmin(false);
+    }
   }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
+    setIsAdmin(false);
     window.location.reload();
   };
 
@@ -57,6 +76,11 @@ export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
             <Link href="/dashboard" className="text-sm font-medium text-green-800 hover:underline">
               Dashboard
             </Link>
+            {isAdmin && (
+              <Link href="/admin/users" className="text-sm font-medium text-green-800 hover:underline">
+                Admin
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-green-800"
