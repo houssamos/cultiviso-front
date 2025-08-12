@@ -31,7 +31,7 @@ export default function AdminUsersPage() {
     })
       .then(res => res.json())
       .then(data => {
-        setUsers(data?.users || data || []);
+        setUsers(data?.users || data.data || []);
       })
       .catch(err => console.error(err));
   }, [page, limit]);
@@ -50,7 +50,6 @@ export default function AdminUsersPage() {
                 <th className="p-2 border">Identité</th>
                 <th className="p-2 border">Stats</th>
                 <th className="p-2 border">Marketplace</th>
-                <th className="p-2 border">Global</th>
                 <th className="p-2 border">Date d'inscription</th>
               </tr>
             </thead>
@@ -64,7 +63,6 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="p-2 border">{user.statsSubscribed ? 'Oui' : 'Non'}</td>
                   <td className="p-2 border">{user.marketplaceSubscribed ? 'Oui' : 'Non'}</td>
-                  <td className="p-2 border">{user.subscribed ? 'Oui' : 'Non'}</td>
                   <td className="p-2 border">
                     {user.subscriptionDate ? new Date(user.subscriptionDate).toLocaleDateString() : ''}
                   </td>
