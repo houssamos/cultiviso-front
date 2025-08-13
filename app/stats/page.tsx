@@ -22,7 +22,6 @@ import { API_BASE, API_KEY } from '@/lib/api';
 import ChartTabs, { TabOption } from '@/components/pages/stats/ChartTabs';
 import IndicatorTabs, { IndicatorTabOption } from '@/components/pages/stats/IndicatorTabs';
 import { FiLayers, FiTrendingUp, FiPackage } from 'react-icons/fi';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 ChartJS.register(
   CategoryScale,
@@ -63,6 +62,7 @@ interface StatItem {
 }
 
 function StatsContent() {
+  const [isAuth, setIsAuth] = useState(false);
   const [cultures, setCultures] = useState<Culture[]>([]);
   const [years, setYears] = useState<number[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -74,6 +74,11 @@ function StatsContent() {
   const [selectedIndicator, setSelectedIndicator] = useState<'surfaceHa' | 'yieldQxHa' | 'productionT'>('surfaceHa');
 
   useEffect(() => {
+    setIsAuth(!!localStorage.getItem('token'));
+  }, []);
+
+  useEffect(() => {
+    if (!isAuth) return;
     fetch(`${API_BASE}/v1/cultures`, {
       headers: { 'X-api-key': API_KEY || '' }
     })
@@ -87,16 +92,17 @@ function StatsContent() {
       .then((res) => res.json())
       .then(setYears)
       .catch(console.error);
-    
+
     fetch(`${API_BASE}/v1/regions`, {
       headers: { 'X-api-key': API_KEY || '' }
     })
       .then((res) => res.json())
       .then(setRegions)
       .catch(console.error);
-  }, []);
+  }, [isAuth]);
 
   useEffect(() => {
+    if (!isAuth) return;
     const params = new URLSearchParams();
     if (selectedYear) params.append('year', String(selectedYear));
     if (selectedCulture) params.append('cultureId', selectedCulture);
@@ -113,7 +119,11 @@ function StatsContent() {
         setStats(items);
       })
       .catch(console.error);
-  }, [selectedYear, selectedCulture, selectedRegion /*, granularity*/]);
+  }, [selectedYear, selectedCulture, selectedRegion, isAuth /*, granularity*/]);
+
+  if (!isAuth) {
+    return <p className="p-4">Access denied</p>;
+  }
 
   const yearMap = stats.reduce<Record<number, StatItem[]>>((acc, item) => {
     if (!acc[item.year]) acc[item.year] = [];
@@ -309,9 +319,5 @@ function StatsContent() {
 }
 
 export default function StatsPage() {
-  return (
-    <ProtectedRoute>
-      <StatsContent />
-    </ProtectedRoute>
-  );
+  return <StatsContent />;
 }
