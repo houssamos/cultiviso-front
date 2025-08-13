@@ -78,6 +78,13 @@ function StatsContent() {
   }, []);
 
   useEffect(() => {
+    if (!isAuth) {
+      setSelectedIndicator('surfaceHa');
+      setSelectedChart('line');
+    }
+  }, [isAuth]);
+
+  useEffect(() => {
     if (!isAuth) return;
     fetch(`${API_BASE}/v1/cultures`, {
       headers: { 'X-api-key': API_KEY || '' }
@@ -120,11 +127,6 @@ function StatsContent() {
       })
       .catch(console.error);
   }, [selectedYear, selectedCulture, selectedRegion, isAuth /*, granularity*/]);
-
-  if (!isAuth) {
-    return <p className="p-4">Access denied</p>;
-  }
-
   const yearMap = stats.reduce<Record<number, StatItem[]>>((acc, item) => {
     if (!acc[item.year]) acc[item.year] = [];
     acc[item.year].push(item);
@@ -238,23 +240,31 @@ function StatsContent() {
   }]
 };
 
-  const chartTabs: TabOption[] = [
-    { id: 'line', label: 'Ligne' },
-    { id: 'bar', label: 'Barres' },
-    { id: 'pie', label: 'Secteurs' },
-    { id: 'doughnut', label: 'Donut' },
-    { id: 'radar', label: 'Radar' },
-    { id: 'polar', label: 'Polar' },
-    { id: 'scatter', label: 'Nuage' },
-    { id: 'bubble', label: 'Bulles' },
-    { id: 'barh', label: 'Barres H' },
-  ];
+  const chartTabs: TabOption[] = isAuth
+    ? [
+        { id: 'line', label: 'Ligne' },
+        { id: 'bar', label: 'Barres' },
+        { id: 'pie', label: 'Secteurs' },
+        { id: 'doughnut', label: 'Donut' },
+        { id: 'radar', label: 'Radar' },
+        { id: 'polar', label: 'Polar' },
+        { id: 'scatter', label: 'Nuage' },
+        { id: 'bubble', label: 'Bulles' },
+        { id: 'barh', label: 'Barres H' },
+      ]
+    : [
+        { id: 'line', label: 'Ligne' },
+      ];
 
-  const indicatorTabs: IndicatorTabOption[] = [
-    { id: 'surfaceHa', label: 'Surface', icon: FiLayers },
-    { id: 'yieldQxHa', label: 'Rendement', icon: FiTrendingUp },
-    { id: 'productionT', label: 'Production', icon: FiPackage },
-  ];
+  const indicatorTabs: IndicatorTabOption[] = isAuth
+    ? [
+        { id: 'surfaceHa', label: 'Surface', icon: FiLayers },
+        { id: 'yieldQxHa', label: 'Rendement', icon: FiTrendingUp },
+        { id: 'productionT', label: 'Production', icon: FiPackage },
+      ]
+    : [
+        { id: 'surfaceHa', label: 'Surface', icon: FiLayers },
+      ];
 
   return (
     <div className="p-4 space-y-8">
