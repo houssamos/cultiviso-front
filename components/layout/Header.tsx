@@ -77,17 +77,9 @@ export default function Header({ menuOpen, setMenuOpen }: HeaderProps) {
               Dashboard
             </Link>
             {isAdmin && (
-              <>
-                <Link href="/admin/users" className="text-sm font-medium text-green-800 hover:underline">
-                  Admin
-                </Link>
-                <Link
-                  href="/admin/notifications"
-                  className="text-sm font-medium text-green-800 hover:underline"
-                >
-                  Notifications
-                </Link>
-              </>
+              <Link href="/admin/users" className="text-sm font-medium text-green-800 hover:underline">
+                Admin
+              </Link>
             )}
             <button
               onClick={handleLogout}
