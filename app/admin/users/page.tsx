@@ -22,6 +22,8 @@ export default function AdminUsersPage() {
   const [limit, setLimit] = useState(10);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [sendStats, setSendStats] = useState(false);
+  const [sendMarketplace, setSendMarketplace] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -50,11 +52,18 @@ export default function AdminUsersPage() {
       setMessage({ type: 'error', text: "Vous devez être connecté." });
       return;
     }
+    if (!sendStats && !sendMarketplace) {
+      setMessage({ type: 'error', text: 'Veuillez sélectionner au moins un public.' });
+      return;
+    }
 
     setSending(true);
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/v1/notifications/admin/send`, {
+      const params = new URLSearchParams();
+      if (sendStats) params.append('stats', 'true');
+      if (sendMarketplace) params.append('marketplace', 'true');
+      const res = await fetch(`${API_BASE}/v1/notifications/admin/send?${params.toString()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,6 +77,8 @@ export default function AdminUsersPage() {
         setMessage({ type: 'success', text: data?.message || 'Email envoyé.' });
         setSubject('');
         setBody('');
+        setSendStats(false);
+        setSendMarketplace(false);
       } else {
         setMessage({ type: 'error', text: data?.message || "Échec de l'envoi." });
       }
@@ -168,6 +179,24 @@ export default function AdminUsersPage() {
               className="w-full border p-2 rounded h-40"
               placeholder="Contenu du mail"
             />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={sendStats}
+                onChange={e => setSendStats(e.target.checked)}
+              />
+              <span>Stats</span>
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={sendMarketplace}
+                onChange={e => setSendMarketplace(e.target.checked)}
+              />
+              <span>Marketplace</span>
+            </label>
           </div>
           {message && (
             <p className={`text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
