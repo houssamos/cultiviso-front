@@ -85,7 +85,6 @@ function StatsContent() {
   }, [isAuth]);
 
   useEffect(() => {
-    if (!isAuth) return;
     fetch(`${API_BASE}/v1/cultures`, {
       headers: { 'X-api-key': API_KEY || '' }
     })
@@ -109,7 +108,6 @@ function StatsContent() {
   }, [isAuth]);
 
   useEffect(() => {
-    if (!isAuth) return;
     const params = new URLSearchParams();
     if (selectedYear) params.append('year', String(selectedYear));
     if (selectedCulture) params.append('cultureId', selectedCulture);
